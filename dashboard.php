@@ -1659,7 +1659,6 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 			const heuresPrepParResponsable = {};
 			const objectifsParStatut = {};
 			const objectifsParProjet = {};
-			const descriptionParProjet = {};
 			const objectifsParMois = {};
 			const objectifsParPartenaire = {};
 			const objectifsParPublic = {};
@@ -1687,14 +1686,6 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 				// Projet
 				const projet = c.projet || 'Non affecté';
 				objectifsParProjet[projet] = (objectifsParProjet[projet] || 0) + 1;
-				
-				// Stocker les descriptions des actions projet
-				if (!descriptionParProjet[projet]) {
-					descriptionParProjet[projet] = [];
-				}
-				if (c.actProjet && !descriptionParProjet[projet].includes(c.actProjet)) {
-					descriptionParProjet[projet].push(c.actProjet);
-				}
 
 				// Mois
 				const mois = c.mois || 'Non précisé';
@@ -1722,14 +1713,14 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 
 			// Mise à jour des graphiques
 			renderCoordBarChart('chartStatutCoord', objectifsParStatut, 'Objectifs');
-			renderCoordBarChart('chartProjetCoord', objectifsParProjet, 'Objectifs', descriptionParProjet);
+			renderCoordBarChart('chartProjetCoord', objectifsParProjet, 'Objectifs');
 			renderCoordBarChart('chartResponsableCoord', heuresPrepParResponsable, 'h');
 			renderCoordBarChart('chartMoisCoord', objectifsParMois, 'Objectifs');
 			renderCoordBarChart('chartPartenaireCoord', objectifsParPartenaire, 'Objectifs');
 			renderCoordBarChart('chartPublicCoord', objectifsParPublic, 'Objectifs');
 		}
 
-		function renderCoordBarChart(containerId, dataObj, unitLabel, descriptionsMap) {
+		function renderCoordBarChart(containerId, dataObj, unitLabel) {
 			const container = document.getElementById(containerId);
 			if (!container) {
 				console.error('❌ Container pas trouvé:', containerId);
@@ -1753,18 +1744,6 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 					displayValue = formatHoursToHM(value);
 				}
 				
-				// Récupérer les descriptions si disponibles
-				let descriptionHtml = '';
-				if (descriptionsMap && descriptionsMap[label] && descriptionsMap[label].length > 0) {
-					const descriptions = descriptionsMap[label];
-					descriptionHtml = `
-						<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-left: 3px solid #2196F3; border-radius: 4px; font-size: 13px; color: #555;">
-							<strong>📝 Actions du projet:</strong><br>
-							${descriptions.map(desc => `<div style="margin-top: 5px;">• ${desc}</div>`).join('')}
-						</div>
-					`;
-				}
-				
 				return `
 					<div class="bar-item">
 						<span class="bar-label">${label}</span>
@@ -1773,7 +1752,6 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 								${displayValue}
 							</div>
 						</div>
-						${descriptionHtml}
 					</div>
 				`;
 			}).join('');
