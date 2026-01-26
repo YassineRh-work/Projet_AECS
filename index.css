@@ -158,8 +158,8 @@ main {
 }
 
 .hero-logo {
-    height: 100px !important;
-    width: 100px !important;
+    height: 200px !important;
+    width: 200px !important;
     margin-bottom: 15px;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
     animation: float 3s ease-in-out infinite;
