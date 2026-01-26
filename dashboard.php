@@ -52,7 +52,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     <h2>➕ Ajouter une activité</h2>
                     <button class="btn" id="toggleActivityBtn" onclick="toggleActivityForm()">Afficher</button>
                 </div>
-                <form id="activityForm" style="display: none;">
+                <form id="activityForm" style="display: none;" novalidate>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Projet</label>
@@ -67,7 +67,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreProjetOpGroup" style="display: none;">
                             <label>Préciser le projet</label>
-                            <input type="text" id="autreProjetOp" placeholder="Entrez le nom du projet">
+                            <input type="text" id="autreProjetOp" name="autreProjetOp" placeholder="Entrez le nom du projet">
                         </div>
                         <div class="form-group">
                             <label>Mois</label>
@@ -118,7 +118,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreTypeGroup" style="display: none;">
                             <label>Préciser le type</label>
-                            <input type="text" id="autreType" placeholder="Entrez le type d'atelier">
+                            <input type="text" id="autreType" name="autreType" placeholder="Entrez le type d'atelier">
                         </div>
                         <div class="form-group">
                             <label>Responsable</label>
@@ -132,7 +132,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreResponsableGroup" style="display: none;">
                             <label>Préciser le responsable</label>
-                            <input type="text" id="autreResponsable" placeholder="Entrez le nom du responsable">
+                            <input type="text" id="autreResponsable" name="autreResponsable" placeholder="Entrez le nom du responsable">
                         </div>
                         <div class="form-group">
                             <label>Lieu</label>
@@ -283,7 +283,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     <h2>🎯 Vue Coordinateur - Gestion stratégique</h2>
                     <button class="btn" id="toggleCoordFormBtn" onclick="toggleCoordForm()">Afficher</button>
                 </div>
-                <form id="coordForm" style="display: none;">
+                <form id="coordForm" style="display: none;" novalidate>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Pôles</label>
@@ -324,7 +324,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreProjetGroup" style="display: none;">
                             <label>Préciser le projet</label>
-                            <input type="text" id="autreProjet" placeholder="Entrez le nom du projet">
+                            <input type="text" id="autreProjet" name="autreProjet" placeholder="Entrez le nom du projet">
                         </div>
                         <div class="form-group">
                             <label>Partenaire</label>
@@ -335,7 +335,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autrePartenaireGroup" style="display: none;">
                             <label>Préciser le partenaire</label>
-                            <input type="text" id="autrePartenaire" placeholder="Entrez le nom du partenaire" onchange="addPartnerToList()">
+                            <input type="text" id="autrePartenaire" name="autrePartenaire" placeholder="Entrez le nom du partenaire" onchange="addPartnerToList()">
                         </div>
                         <div class="form-group">
                             <label>Type d'atelier</label>
@@ -350,7 +350,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreTypeCoordGroup" style="display: none;">
                             <label>Préciser le type</label>
-                            <input type="text" id="autreTypeCoord" placeholder="Entrez le type d'atelier">
+                            <input type="text" id="autreTypeCoord" name="autreTypeCoord" placeholder="Entrez le type d'atelier">
                         </div>
                         <div class="form-group">
                             <label>Mois</label>
@@ -371,8 +371,12 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Date</label>
+                            <label>Date début</label>
                             <input type="date" id="coordDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date fin</label>
+                            <input type="date" id="coordDateFin">
                         </div>
                         <div class="form-group">
                             <label>Responsable</label>
@@ -387,7 +391,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autreResponsableCoordGroup" style="display: none;">
                             <label>Préciser le responsable</label>
-                            <input type="text" id="autreResponsableCoord" placeholder="Entrez le nom du responsable">
+                            <input type="text" id="autreResponsableCoord" name="autreResponsableCoord" placeholder="Entrez le nom du responsable">
                         </div>
                         <div class="form-group">
                             <label>Activité / Objectif</label>
@@ -426,7 +430,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group" id="autrePublicGroup" style="display: none;">
                             <label>Préciser le public</label>
-                            <input type="text" id="autrePublic" placeholder="Entrez le public ciblé">
+                            <input type="text" id="autrePublic" name="autrePublic" placeholder="Entrez le public ciblé">
                         </div>
                         <div class="form-group">
                             <label>Description de l'action partenaire</label>
@@ -522,7 +526,8 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                                 <th>Projet</th>
                                 <th>Mois</th>
                                 <th>Partenaire</th>
-                                <th>Date</th>
+                                <th>Date début</th>
+                                <th>Date fin</th>
                                 <th>Type d'atelier</th>
                                 <th>Activité</th>
                                 <th>Responsable</th>
@@ -1092,6 +1097,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
             const coordActivity = {
                 mois: document.getElementById('coordMois').value,
                 date: document.getElementById('coordDate').value,
+                dateFin: document.getElementById('coordDateFin').value || '',
                 responsable: responsable,
                 projet: projet || '',
                 partenaire: partenaire || '',
@@ -1236,6 +1242,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     <td>${activity.mois}</td>
                     <td>${activity.partenaire || '-'}</td>
                     <td>${activity.date}</td>
+                    <td>${activity.dateFin || '-'}</td>
                     <td>${activity.typeAtelier || '-'}</td>
                     <td><strong>${activity.activite}</strong><br><small>${activity.commentaires || ''}</small>${activity.materiel ? '<br><small>📋 ' + activity.materiel + '</small>' : ''}</td>
                     <td>${activity.responsable}</td>
@@ -1350,6 +1357,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 
             document.getElementById('coordMois').value = activity.mois;
             document.getElementById('coordDate').value = activity.date;
+            document.getElementById('coordDateFin').value = activity.dateFin || '';
 
             const standardResponsables = ['Amira', 'Karim', 'Denis', 'Équipe complète'];
             if (standardResponsables.includes(activity.responsable)) {
@@ -1482,6 +1490,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     pole: c.pole ?? null,
 					mois: c.mois,
 					date: c.date,
+					dateFin: c.date_fin || '',
 					responsable: c.responsable,
 					activite: c.activite,
 					public: c.public_cible,

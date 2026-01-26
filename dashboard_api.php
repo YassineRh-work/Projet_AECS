@@ -133,11 +133,11 @@ if ($method === 'POST') {
 
         $stmtC = $pdo->prepare("
             INSERT INTO coord_activites
-            (projet, mois, date, responsable, activite, public_cible,
+            (projet, mois, date, date_fin, responsable, activite, public_cible,
              partenaire, type_atelier, lieu, duree_prep, statut, commentaires, pole,
              description_action_partenaire, description_action_projet, piece_jointe)
             VALUES
-            (:projet, :mois, :date, :responsable, :activite, :public_cible,
+            (:projet, :mois, :date, :date_fin, :responsable, :activite, :public_cible,
              :partenaire, :type_atelier, :lieu, :duree_prep, :statut, :commentaires, :pole,
              :description_action_partenaire, :description_action_projet, :piece_jointe)
         ");
@@ -147,6 +147,7 @@ if ($method === 'POST') {
                 ':projet'       => $c['projet']       ?? null,
                 ':mois'         => $c['mois']         ?? null,
                 ':date'         => $c['date']         ?? null,
+                ':date_fin'     => $c['dateFin']      ?? null,
                 ':responsable'  => $c['responsable']  ?? null,
                 ':activite'     => $c['activite']     ?? null,
                 ':public_cible' => $c['public']       ?? null,
