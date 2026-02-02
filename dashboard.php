@@ -41,8 +41,8 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
         <div class="tabs">
             <button class="tab active" onclick="switchTab('coordinateur')">🎯 Coordinateur</button>
             <button class="tab" onclick="switchTab('operationnelle')">👥 Équipe Opérationnelle</button>
-            <button class="tab" onclick="switchTab('stats')">📈 Statistiques Équipe</button>
             <button class="tab" onclick="switchTab('statsCoord')">📊 Statistiques Coordinateur</button>
+            <button class="tab" onclick="switchTab('stats')">📈 Statistiques Équipe</button>
         </div>
 
         <!-- Section Équipe Opérationnelle -->
@@ -660,14 +660,29 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     <div class="label">objectifs stratégiques</div>
                 </div>
                 <div class="stat-card">
-                    <h3>⏰ Heures préparation</h3>
+                    <h3>⏰ Heures totales</h3>
                     <div class="value" id="totalHeuresPrepCoord">0h</div>
-                    <div class="label">temps de préparation</div>
+                    <div class="label">heures prévues</div>
                 </div>
                 <div class="stat-card">
-                    <h3>✅ Objectifs réalisés</h3>
-                    <div class="value" id="objectifsTerminesCoord">0</div>
-                    <div class="label">terminés</div>
+                    <h3>👥 Responsables actifs</h3>
+                    <div class="value" id="responsablesActifsCoord">0</div>
+                    <div class="label">membres de l'équipe</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Moyenne</h3>
+                    <div class="value" id="moyenneHeuresCoord">0h</div>
+                    <div class="label">par objectif</div>
+                </div>
+                <div class="stat-card">
+                    <h3>✅ Taux réalisé</h3>
+                    <div class="value" id="tauxRealiseCoord">0% (0)</div>
+                    <div class="label">objectifs réalisés</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚠️ Taux annulé</h3>
+                    <div class="value" id="tauxAnnuleCoord">0% (0)</div>
+                    <div class="label">objectifs annulés</div>
                 </div>
             </div>
 
@@ -1723,6 +1738,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 			const objectifsParPublic = {};
 			const responsablesSet = new Set();
 			let objectifsTermines = 0;
+			let annuleCount = 0;
 
 			list.forEach(c => {
 				// Heures de préparation
@@ -1735,11 +1751,16 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 					heuresPrepParResponsable[c.responsable] = (heuresPrepParResponsable[c.responsable] || 0) + dureeHeures;
 				}
 
-				// Statut
+				// Statut (normalisé sans accents)
+				const stRaw = (c.statut || '').toString().trim().toLowerCase();
+				const stNo = (typeof stRaw.normalize === 'function') ? stRaw.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : stRaw;
 				const statut = c.statut || 'Non défini';
 				objectifsParStatut[statut] = (objectifsParStatut[statut] || 0) + 1;
-				if (statut.toLowerCase() === 'terminé') {
+				if (stNo === 'termine') {
 					objectifsTermines++;
+				}
+				if (stNo === 'annule') {
+					annuleCount++;
 				}
 
 				// Projet
@@ -1764,11 +1785,30 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 			// Taux de réussite
 			// const tauxReussite = total > 0 ? Math.round((objectifsTermines / total) * 100) : 0;
 
-			// Mise à jour des compteurs
-			document.getElementById('totalObjectifsCoord').textContent = total.toString();
-			document.getElementById('totalHeuresPrepCoord').textContent = formatHoursToHM(totalHeuresPrep);
-			document.getElementById('objectifsTerminesCoord').textContent = objectifsTermines.toString();
-			// document.getElementById('tauxReussiteCoord').textContent = tauxReussite + '%';
+			// Mise à jour des compteurs (protégée si éléments manquent)
+			const elTotalObj = document.getElementById('totalObjectifsCoord');
+			if (elTotalObj) elTotalObj.textContent = total.toString();
+			const elTotalHeures = document.getElementById('totalHeuresPrepCoord');
+			if (elTotalHeures) elTotalHeures.textContent = formatHoursToHM(totalHeuresPrep);
+			// Responsables actifs
+			const elResp = document.getElementById('responsablesActifsCoord');
+			if (elResp) elResp.textContent = responsablesSet.size.toString();
+			// Moyenne d'heures par objectif
+			const moyenneCoord = total > 0 ? (totalHeuresPrep / total) : 0;
+			const elMoy = document.getElementById('moyenneHeuresCoord');
+			if (elMoy) elMoy.textContent = formatHoursToHM(moyenneCoord);
+			// Objectifs terminés (compte absolu) - optionnel
+			const elTerm = document.getElementById('objectifsTerminesCoord');
+			if (elTerm) elTerm.textContent = objectifsTermines.toString();
+
+			// Taux réalisé / annulé
+			const annCount = annuleCount || 0;
+			const pctReal = total ? Math.round(1000 * objectifsTermines / total) / 10 : 0;
+			const pctAnn = total ? Math.round(1000 * annCount / total) / 10 : 0;
+			const elRealC = document.getElementById('tauxRealiseCoord');
+			if (elRealC) elRealC.textContent = `${pctReal}% (${objectifsTermines})`;
+			const elAnnC = document.getElementById('tauxAnnuleCoord');
+			if (elAnnC) elAnnC.textContent = `${pctAnn}% (${annCount})`;
 
 			// Mise à jour des graphiques
 			renderCoordBarChart('chartStatutCoord', objectifsParStatut, 'Objectifs');
