@@ -98,9 +98,19 @@ if ($method === 'POST') {
 
         // On commence une transaction pour ne pas laisser la base vide en cas d’erreur
         $pdo->beginTransaction();
+        $pdo->exec("
+        INSERT INTO activites_backup (projet,pole,mois,date,periode,objectif,type_atelier,responsable,lieu,heure_debut,heure_fin,duree,participants,commentaire,statut,op_type,op_time,op_user)
+        SELECT projet,pole,mois,date,periode,objectif,type_atelier,responsable,lieu,heure_debut,heure_fin,duree,participants,commentaire,statut,'SNAPSHOT',NOW(),CURRENT_USER()
+        FROM activites
+        ");
 
-        $pdo->exec("TRUNCATE TABLE activites");
-        $pdo->exec("TRUNCATE TABLE coord_activites");
+        $pdo->exec("
+        INSERT INTO coord_activites_backup (projet,mois,date,date_fin,responsable,activite,public_cible,partenaire,type_atelier,lieu,duree_prep,statut,commentaires,pole,description_action_partenaire,description_action_projet,piece_jointe,op_type,op_time,op_user)
+        SELECT projet,mois,date,date_fin,responsable,activite,public_cible,partenaire,type_atelier,lieu,duree_prep,statut,commentaires,pole,description_action_partenaire,description_action_projet,piece_jointe,'SNAPSHOT',NOW(),CURRENT_USER()
+        FROM coord_activites
+        ");
+        $pdo->exec("DELETE FROM activites");
+        $pdo->exec("DELETE FROM coord_activites");
 
         $stmtA = $pdo->prepare("
             INSERT INTO activites

@@ -180,15 +180,15 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                                 <?php endif; ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Statut</label>
-                        <select id="statut" required>
-                            <option value="Prévu">Prévu</option>
-                            <option value="En cours">En cours</option>
-                            <option value="Terminé">Terminé</option>
-                            <option value="Annulé">Annulé</option>
-                        </select>
+                        <div class="form-group">
+                            <label>Statut</label>
+                            <select id="statut" required>
+                                <option value="Prévu">Prévu</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Terminé">Terminé</option>
+                                <option value="Annulé">Annulé</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Commentaire</label>
@@ -443,11 +443,11 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                         <div class="form-group">
                             <label>Description de l'action partenaire</label>
-                            <textarea id="coordActPart" placeholder="Décrivez le matériel requis et l'action à réaliser..." style="min-height: 80px;"></textarea>
+                            <textarea id="coordActPart" placeholder="" style="min-height: 80px;"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Description de l'action projet</label>
-                            <textarea id="coordActProjet" placeholder="Décrivez le matériel requis et l'action à réaliser..." style="min-height: 80px;"></textarea>
+                            <textarea id="coordActProjet" placeholder="" style="min-height: 80px;"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Lieu</label>
