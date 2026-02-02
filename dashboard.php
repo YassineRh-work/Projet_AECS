@@ -182,6 +182,15 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                         </div>
                     </div>
                     <div class="form-group">
+                        <label>Statut</label>
+                        <select id="statut" required>
+                            <option value="Prévu">Prévu</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Terminé">Terminé</option>
+                            <option value="Annulé">Annulé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Commentaire</label>
                         <textarea id="commentaire" placeholder="Notes supplémentaires..."></textarea>
                     </div>
@@ -844,7 +853,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
             document.getElementById(tab).classList.add('active');
             
             if (tab === 'stats') {
-                updateStatistics();
+                updateStats();
             } else if (tab === 'statsCoord') {
                 updateCoordStatistics();
             }
@@ -1058,22 +1067,23 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                 duree: document.getElementById('duree').value,
                 participants: document.getElementById('participants').value,
                 commentaire: document.getElementById('commentaire').value,
-                statut: 'Prévu'
+                statut: (document.getElementById('statut')?.value) || 'Prévu'
             };
-            
+
             if (editingIndex >= 0) {
                 activities[editingIndex] = activity;
                 editingIndex = -1;
             } else {
                 activities.push(activity);
             }
-            
+
             this.reset();
             document.getElementById('autreTypeGroup').style.display = 'none';
             document.getElementById('autreResponsableGroup').style.display = 'none';
             document.getElementById('autreProjetOpGroup').style.display = 'none';
             renderActivities();
-			saveDataToDB();
+            updateStats();
+            saveDataToDB();
         });
 
         document.getElementById('coordForm').addEventListener('submit', function(e) {
@@ -1146,6 +1156,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
             removeFile();
             updatePartnersFilterSelect();
             renderCoordActivities();
+			updateCoordStatistics();
 			saveDataToDB(); 
             this.reset();
         });
@@ -1349,7 +1360,10 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
             document.getElementById('participants').value = activity.participants;
             document.getElementById('pole').value = activity.pole || '';
             document.getElementById('commentaire').value = activity.commentaire;
-            
+            // Remplir le statut si présent
+            if (document.getElementById('statut')) {
+                document.getElementById('statut').value = activity.statut || 'Prévu';
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1357,6 +1371,7 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
             if (confirm('Êtes-vous sûr de vouloir supprimer cette activité ?')) {
                 activities.splice(index, 1);
                 renderActivities();
+                updateStats();
                 saveDataToDB();
             }
         }
@@ -1651,6 +1666,19 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 				const mois = a.mois || 'Non précisé';
 				activitesParMois[mois] = (activitesParMois[mois] || 0) + 1;
 			});
+
+			// Recompute realised/annule counts robustly (normalize accents)
+			{
+				let rCount = 0, aCount = 0;
+				list.forEach(a2 => {
+					const stRaw2 = (a2.statut || '').toString().trim().toLowerCase();
+					const stNo2 = (typeof stRaw2.normalize === 'function') ? stRaw2.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : stRaw2;
+					if (stNo2 === 'termine') rCount++;
+					if (stNo2 === 'annule') aCount++;
+				});
+				realiseCount = rCount;
+				annuleCount = aCount;
+			}
 
 			// 3. Responsables actifs
 			const nbResponsables = responsablesSet.size;
