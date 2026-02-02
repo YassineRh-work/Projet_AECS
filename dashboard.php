@@ -596,6 +596,16 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
                     <div class="value" id="moyenneHeures">0h</div>
                     <div class="label">par activité</div>
                 </div>
+                <div class="stat-card">
+                    <h3>✅ Taux réalisé</h3>
+                    <div class="value" id="tauxRealise">0%</div>
+                    <div class="label">activités réalisées</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚠️ Taux annulé</h3>
+                    <div class="value" id="tauxAnnule">0%</div>
+                    <div class="label">activités annulées</div>
+                </div>
             </div>
 
             <div class="chart-container">
@@ -1608,6 +1618,8 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 			const activitesParType = {};
 			const activitesParMois = {};
 			const responsablesSet = new Set();
+			let realiseCount = 0;
+			let annuleCount = 0;
 			console.log('DEBUG durees activities:', list.map(a => a.duree));
 
 			list.forEach(a => {
@@ -1619,6 +1631,17 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 					responsablesSet.add(a.responsable);
 					heuresParResponsable[a.responsable] = (heuresParResponsable[a.responsable] || 0) + dureeHeures;
 				}
+
+				// Statut (réalisé / annulé) - normalisation stricte
+				const stRaw = (a.statut || '').toString().trim().toLowerCase();
+				// retire les accents pour comparer de manière fiable (Prévu, En cours, Terminé, Annulé)
+				const st = stRaw.normalize('NFD').replace(/[-]/g, '').replace(/[-]/g, '').replace(/[-]/g, '').replace(/[-]/g, '');
+				// fallback plus simple si normalize non supporté (sécurité faible)
+				// const st = stRaw.normalize ? stRaw.normalize('NFD').replace(/[E-\u036f]/g, '') : stRaw;
+				// on utilise la forme sans accents
+				const stNoAccent = stRaw.normalize ? stRaw.normalize('NFD').replace(/[C-\u036f]/g, '') : stRaw;
+				if (stNoAccent === 'termine') realiseCount++;
+				if (stNoAccent === 'annule') annuleCount++;
 
 				// Type d'atelier (a.type dans ton mapping)
 				const type = a.type || 'Non précisé';
@@ -1640,6 +1663,14 @@ $userPoles = !empty($userPoleString) ? array_map('trim', explode(',', $userPoleS
 			document.getElementById('responsablesActifs').textContent = nbResponsables.toString();
 			document.getElementById('totalHeures').textContent = formatHoursToHM(totalHeures);
 			document.getElementById('moyenneHeures').textContent = formatHoursToHM(moyenne);
+
+			// Taux réalisé / annulé (affichage avec compte absolu)
+			const pctRealise = total ? Math.round(1000 * realiseCount / total) / 10 : 0;
+			const pctAnnule = total ? Math.round(1000 * annuleCount / total) / 10 : 0;
+			const elReal = document.getElementById('tauxRealise');
+			if (elReal) elReal.textContent = `${pctRealise}% (${realiseCount})`;
+			const elAnn = document.getElementById('tauxAnnule');
+			if (elAnn) elAnn.textContent = `${pctAnnule}% (${annuleCount})`;
 
 			// Mise à jour des "graphes" simples en barres (HTML/CSS)
 			renderBarChart('chartType', activitesParType, 'Activités');
